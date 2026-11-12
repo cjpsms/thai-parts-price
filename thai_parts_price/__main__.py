@@ -27,7 +27,14 @@ def main(argv=None) -> int:
     ap.add_argument("items", nargs="*", help='wanted items, e.g. "dht11 x3"')
     ap.add_argument("--refresh-shipping", action="store_true",
                     help="re-read every shop's shipping rules from its cart (no order is placed)")
+    ap.add_argument("--serve", action="store_true", help="open the web page (local server)")
+    ap.add_argument("--port", type=int, default=4027, help="port for --serve (default 4027, 127.0.0.1 only)")
     a = ap.parse_args(argv)
+
+    if a.serve:
+        from . import server
+        server.serve(a.port)
+        return 0
 
     if a.refresh_shipping:
         d = shipping.refresh()

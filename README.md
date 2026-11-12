@@ -27,6 +27,7 @@ Work in progress, built step by step.
 - [x] Shipping rules per shop, read from the shops' carts (fee steps, free-shipping threshold)
 - [x] Basket optimiser (which item from which shop, items + shipping)
 - [x] CLI
+- [x] Web page (local server)
 
 ## Usage
 
@@ -38,9 +39,17 @@ python -m thai_parts_price "esp32 devkit" "dht11 x3" "ตัวต้านท�
 
 Each argument is one wanted item; `xN` at the end is the quantity. It searches the three shops, picks the best match per shop, then prints the cheapest basket (which item from which shop) with items + shipping, and compares it with what you would pay buying the cheapest item each time.
 
+### Web page
+
+```
+python -m thai_parts_price --serve        # http://127.0.0.1:4027/
+```
+
+A small local web server (standard library only, 127.0.0.1) with separate pages and files in `thai_parts_price/web/`: `/` to enter the list and see the cheapest basket, `/shipping` for each shop's shipping rules. A search can be shared as a link: `/?q=esp32+devkit&q=dht11+x3`. Only a fixed list of files is served, and scraped links are only shown if they stay on the shop's own site.
+
 ```
 python -m thai_parts_price --refresh-shipping   # re-read the shops' shipping rules
-python tests/test_search.py && python tests/test_optimize.py
+python tests/test_search.py && python tests/test_optimize.py && python tests/test_service.py
 ```
 
 ## Shipping

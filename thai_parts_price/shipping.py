@@ -38,6 +38,12 @@ class Option:
         return fee
 
 
+    def free_at(self):
+        """Order total from which this option is free, or None."""
+        zeros = [lo for lo, price in self.steps if price == 0 and lo > 0]
+        return min(zeros) if self.kind == "money" and zeros else None
+
+
 def parse_options(shipping_types: dict) -> list[Option]:
     """Turn the cart's `shipping_types` into Options, skipping pickup and unsupported formats."""
     out = []
