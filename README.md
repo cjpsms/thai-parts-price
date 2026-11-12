@@ -12,9 +12,9 @@ Shipping is paid once per shop. A shop that is 10 baht dearer per item can still
 
 | Shop | Status |
 |---|---|
-| allnewstep.com (ArduinoAll) | scraping works |
-| cybertice.com | scraping works |
-| arduitronics.com | scraping works |
+| [allnewstep.com](https://www.allnewstep.com) (ArduinoAll) | scraping works |
+| [cybertice.com](https://www.cybertice.com) | scraping works |
+| [arduitronics.com](https://www.arduitronics.com) | scraping works |
 
 All three run on Lnwshop, so one parser covers them (`/search?q=` returns server-rendered HTML).
 
