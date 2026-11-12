@@ -18,12 +18,9 @@ SHOPS = {
 
 UA = "Mozilla/5.0 (thai-parts-price; price comparison for personal use)"
 
-_ITEM = re.compile(
-    r'<a [^>]*href="(?P<href>[^"]+)"[^>]*>(?P<name>[^<]+)</a></div>\s*'
-    r'<div class="product_price[^"]*" realprice="(?P<price>[\d.]+)"'
-    r'(?P<rest>.{0,400})',
-    re.S,
-)
+_NAME = re.compile(r'class="product_name" title="[^"]*"><a href="(?P<href>[^"]+)"[^>]*>(?P<name>[^<]+)</a>')
+_PRICE = re.compile(r'class="product_price[^"]*" realprice="(?P<price>[\d.]+)"')
+_IMAGE = re.compile(r'<img class="productImage[^"]*"[^>]*data-src="(?P<src>https://[^"]+)"')
 
 
 @dataclass
@@ -33,9 +30,10 @@ class Product:
     price: float
     url: str
     in_stock: bool
+    image: str = ""
 
 
-def fetch(url: str, timeout: int = 20) -> str:
+def fetch(url: str, timeout: int = 12) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", errors="replace")
@@ -43,19 +41,24 @@ def fetch(url: str, timeout: int = 20) -> str:
 
 def parse(shop: str, base: str, page: str) -> list[Product]:
     out = []
-    for m in _ITEM.finditer(page):
-        price = float(m["price"])
-        rest = m["rest"].split("productItem")[0]
-        # price 0 = "coming soon" / not for sale; sold-out items say so in the status box
+    # every product sits in its own <... class="productArea productItem"> block
+    for blk in page.split('class="productArea productItem"')[1:]:
+        n, pr = _NAME.search(blk), _PRICE.search(blk)
+        if not n or not pr:
+            continue
+        price = float(pr["price"])
+        # price 0 = "coming soon" / not for sale; sold-out items say so after the price
         if price <= 0:
             continue
-        sold_out = bool(re.search(r"สินค้าหมด|หมดแล้ว|out of stock", rest, re.I))
+        sold_out = bool(re.search(r"สินค้าหมด|หมดแล้ว|out of stock", blk[pr.end():pr.end() + 400], re.I))
+        img = _IMAGE.search(blk)
         out.append(Product(
             shop=shop,
-            name=unescape(m["name"]).strip(),
+            name=unescape(n["name"]).strip(),
             price=price,
-            url=urllib.parse.urljoin(base + "/", m["href"]),
+            url=urllib.parse.urljoin(base + "/", n["href"]),
             in_stock=not sold_out,
+            image=img["src"] if img else "",
         ))
     return out
 

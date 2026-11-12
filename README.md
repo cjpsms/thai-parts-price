@@ -39,13 +39,21 @@ python -m thai_parts_price "esp32 devkit" "dht11 x3" "ตัวต้านท�
 
 Each argument is one wanted item; `xN` at the end is the quantity. It searches the three shops, picks the best match per shop, then prints the cheapest basket (which item from which shop) with items + shipping, and compares it with what you would pay buying the cheapest item each time.
 
-### Web page
+### Web page (recommended)
 
 ```
 python -m thai_parts_price --serve        # http://127.0.0.1:4027/
 ```
 
-A small local web server (standard library only, 127.0.0.1) with separate pages and files in `thai_parts_price/web/`: `/` to enter the list and see the cheapest basket, `/shipping` for each shop's shipping rules. A search can be shared as a link: `/?q=esp32+devkit&q=dht11+x3`. Only a fixed list of files is served, and scraped links are only shown if they stay on the shop's own site.
+A small local web server (standard library only, 127.0.0.1) with separate pages and files in `thai_parts_price/web/`. It works like a shop aggregator and **never guesses what a product is**:
+
+1. search a word: products from all shops show up with picture, name and price,
+2. you pick the ones that are right (several shops for one wanted item means "any of these is fine"),
+3. the cheapest split is calculated from your picks only, with shipping, and compared with other ways of buying.
+
+The basket is remembered in your browser. `/shipping` shows each shop's shipping rules. A search can be shared as a link: `/?q=esp32+devkit`. Only a fixed list of files is served; scraped links and images are only shown if they stay on the shops' own hosts.
+
+The command line (above) picks products automatically from the search words, so it can pick a wrong item; use the web page when it matters.
 
 ```
 python -m thai_parts_price --refresh-shipping   # re-read the shops' shipping rules

@@ -9,31 +9,30 @@
 </head><body>
 <header class="top"><div class="wrap">
   <a class="brand" href="/"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>Parts Price</a>
-  <nav class="nav"><a href="/" aria-current="page">คำนวณ</a><a href="/shipping" >ค่าส่ง</a></nav>
+  <nav class="nav"><a href="/" aria-current="page">ค้นหา</a><a href="/shipping" >ค่าส่ง</a></nav>
 </div></header>
 <main class="wrap">
-  <section class="hero">
-    <h1>หาร้านที่ถูกสุด <em>ทั้งตะกร้า</em><br>รวมค่าส่งแล้ว</h1>
-    <p>ใส่รายการอุปกรณ์ที่อยากซื้อ ระบบค้น 3 ร้านในไทย แล้วคำนวณว่าแต่ละชิ้นควรซื้อร้านไหน โดยนับค่าส่งที่จ่ายครั้งเดียวต่อร้านด้วย</p>
-    <div class="shops">
-      <span class="chip"><a href="https://www.allnewstep.com" target="_blank" rel="noopener">allnewstep</a></span>
-      <span class="chip"><a href="https://www.cybertice.com" target="_blank" rel="noopener">cybertice</a></span>
-      <span class="chip"><a href="https://www.arduitronics.com" target="_blank" rel="noopener">arduitronics</a></span>
-    </div>
+  <section class="hero compact">
+    <h1>ค้นของ <em>เลือกเอง</em> แล้วให้เราหาร้านที่ถูกสุด</h1>
+    <p>รวมสินค้าจาก 3 ร้านในไทย คุณเลือกเองว่าชิ้นไหนใช่ ระบบคำนวณจากของที่เลือกพร้อมค่าส่ง ไม่เดาแทนคุณ</p>
   </section>
 
-  <form class="form" id="form" autocomplete="off">
-    <div id="rows"></div>
-    <div class="actions">
-      <button class="btn" id="go" type="submit">หาร้านที่ถูกสุด</button>
-      <button class="btn ghost" id="add" type="button">+ เพิ่มรายการ</button>
-      <span class="hint">พิมพ์จำนวนต่อท้ายได้ เช่น dht11 x3 หรือวางหลายบรรทัดทีเดียว</span>
-    </div>
-    <div class="try"><span class="hint">ลองดู:</span><span id="try"></span></div>
+  <form class="searchbar" id="sform" role="search" autocomplete="off">
+    <label class="field big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="ค้นหาสินค้า เช่น esp32 devkit, dht11, ตัวต้านทาน 10k" maxlength="120" aria-label="ค้นหาสินค้า"></label>
+    <button class="btn" id="sgo" type="submit">ค้นหา</button>
   </form>
+  <div class="try"><span class="hint">ลองดู:</span><span id="try"></span></div>
 
-  <div id="out" aria-live="polite"></div>
+  <div class="layout">
+    <section id="main">
+      <div id="plan"></div>
+      <div id="results"></div>
+    </section>
+    <aside class="panel basket" id="basket" aria-label="ตะกร้า"></aside>
+  </div>
 </main>
-<footer class="wrap foot">ราคาและค่าส่งเปลี่ยนได้ ตรวจอีกครั้งตอนจ่ายเงิน. ข้อมูลอ่านจากหน้าค้นหาสาธารณะของแต่ละร้าน.</footer>
+<div class="mbar" id="mbar" hidden><span id="mcount"></span><button class="btn" id="mgo" type="button">คำนวณราคา</button></div>
+<footer class="wrap foot">ราคาและค่าส่งเปลี่ยนได้ ตรวจอีกครั้งตอนจ่ายเงิน. ข้อมูลและรูปมาจากหน้าค้นหาสาธารณะของแต่ละร้าน เป็นของร้านนั้นๆ.</footer>
 <script src="/app.js"></script>
 </body></html>

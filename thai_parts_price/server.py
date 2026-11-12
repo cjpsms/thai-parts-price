@@ -15,7 +15,7 @@ STATIC = {
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
     "/shipping.js": ("shipping.js", "text/javascript; charset=utf-8"),
 }
-MAX_BODY = 16_384
+MAX_BODY = 262_144
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -49,18 +49,21 @@ class Handler(BaseHTTPRequestHandler):
             self._json(404, {"error": "not found"})
 
     def do_POST(self):
-        if self.path != "/api/plan":
+        if self.path not in ("/api/search", "/api/plan"):
             return self._json(404, {"error": "not found"})
         try:
             n = int(self.headers.get("Content-Length", "0"))
             if n <= 0 or n > MAX_BODY:
                 return self._json(413, {"error": "bad size"})
             body = json.loads(self.rfile.read(n).decode("utf-8"))
-            result = service.run(body.get("items"))
-        except (ValueError, KeyError, AttributeError, UnicodeDecodeError):
+            if self.path == "/api/search":
+                result = service.search_products(body.get("query"))
+            else:
+                result = service.plan_from_picks(body.get("groups"))
+        except (ValueError, KeyError, AttributeError, TypeError, UnicodeDecodeError):
             return self._json(400, {"error": "bad request"})
         except Exception as e:  # a shop being down must not crash the server
-            return self._json(502, {"error": f"search failed: {type(e).__name__}"})
+            return self._json(502, {"error": f"failed: {type(e).__name__}"})
         self._json(200, result)
 
     def log_message(self, fmt, *args):
