@@ -43,6 +43,19 @@ class Scoring(unittest.TestCase):
         self.assertGreater(board.rank, acc.rank)
 
 
+    def test_accessory_and_other_part_ranked_below_board(self):
+        board, shield = score([P("ESP32 DevKit V1 board"), P("ESP32 NodeMCU devkit Screw Shield")],
+                              tokenize("esp32 devkit"))
+        self.assertGreater(board.rank, shield.rank)
+        res, ldr = score([P("Resistor 10k 1/4W"), P("5516 Light Dependent Resistor (LDR) 10k")],
+                         tokenize("resistor 10k"))
+        self.assertGreater(res.rank, ldr.rank)
+
+    def test_accessory_word_typed_by_user_is_not_penalised(self):
+        a, = score([P("ESP32 Screw Shield")], tokenize("esp32 shield"))
+        self.assertEqual(a.penalty, 0.0)
+
+
 class Rounds(unittest.TestCase):
     def test_drops_generic_first_then_single_word(self):
         qs = retry_queries(tokenize("arduino uno r3 clone"))

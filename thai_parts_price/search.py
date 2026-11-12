@@ -64,6 +64,12 @@ SYNONYMS = {
 GENERIC = {"arduino", "board", "module", "บอร์ด", "โมดูล", "for", "with", "and",
            "kit", "set", "ชุด", "สำหรับ", "แบบ", "อัน", "ตัว"}
 
+# Words that mean "this is an accessory / a different kind of part". A name with one of
+# them is pushed down unless the user typed that word (so "esp32 devkit" prefers the board
+# over the "ESP32 ... Screw Shield", and "resistor" over "photoresistor / LDR").
+ACCESSORY = {"shield", "case", "box", "sticker", "stand", "holder", "cover", "mount",
+             "photoresistor", "ldr", "dependent", "thermistor", "network", "ปรับค่าได้", "กล่อง", "เคส", "สติกเกอร์", "ขาตั้ง"}
+
 _THAI = re.compile(r"[฀-๿]+")
 _SPLIT = re.compile(r"[\s,;/+]+")
 _SQUASH = re.compile(r"[\s\-_.()/\\\[\]]+")
@@ -132,12 +138,13 @@ class Hit:
     coverage: float        # weighted share of query words found in the name, 0..1
     full: bool             # every query word found
     lead: float = 0.0      # share of the matched weight found at the START of the name, 0..1
+    penalty: float = 0.0   # 0.3 when the name looks like an accessory / different part
 
     @property
     def rank(self) -> float:
         # A board is named "Arduino UNO R3 ..."; accessories say "... for Arduino UNO"
         # at the end. Matches near the start of the name rank higher.
-        return round(self.coverage + 0.25 * self.lead, 2)
+        return round(self.coverage + 0.25 * self.lead - self.penalty, 2)
 
 
 LEAD_CHARS = 30
@@ -152,8 +159,11 @@ def score(products, tokens: list[Token]) -> list[Hit]:
         got_w = sum(t.weight for t in got)
         head = name[:LEAD_CHARS]
         lead_w = sum(t.weight for t in got if t.matches(head))
+        wanted = {squash(t.text) for t in tokens}
+        pen = 0.3 if any(squash(a) in name and squash(a) not in wanted
+                         and not any(squash(a) in w for w in wanted) for a in ACCESSORY) else 0.0
         hits.append(Hit(p, got_w / total, len(got) == len(tokens),
-                        lead_w / got_w if got_w else 0.0))
+                        lead_w / got_w if got_w else 0.0, pen))
     return hits
 
 
