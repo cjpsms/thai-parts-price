@@ -70,8 +70,12 @@ class Basket(unittest.TestCase):
 
 
 class Picking(unittest.TestCase):
-    def H(self, price, full=True, cov=1.0, stock=True, lead=1.0):
-        return Hit(Product("A", "n", price, "u%s" % price, stock), cov, full, lead)
+    def H(self, price, full=True, cov=1.0, stock=True, lead=1.0, pen=0.0):
+        return Hit(Product("A", "n", price, "u%s" % price, stock), cov, full, lead, pen)
+
+    def test_accessory_only_shop_gives_no_offer(self):
+        self.assertIsNone(pick_offer([self.H(60, pen=0.3)]))
+        self.assertEqual(pick_offer([self.H(60, pen=0.3), self.H(170)]).unit, 170)
 
     def test_cheapest_among_close_matches_skips_out_of_stock(self):
         o = pick_offer([self.H(50, stock=False), self.H(120), self.H(100)])

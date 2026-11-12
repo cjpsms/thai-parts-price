@@ -32,7 +32,8 @@ class Offer:
 
 def pick_offer(hits) -> "Offer | None":
     """Best in-stock hit of one shop for one wanted item (cheapest among the closest matches)."""
-    live = [h for h in hits if h.product.in_stock]
+    # in stock, and not flagged as an accessory / different part: a wrong item is worse than none
+    live = [h for h in hits if h.product.in_stock and h.penalty == 0]
     pool = [h for h in live if h.full]
     partial = False
     if not pool:
